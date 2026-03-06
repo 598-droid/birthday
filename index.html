@@ -11,66 +11,112 @@
     <style>
         body { font-family: 'Noto Sans SC', system-ui, sans-serif; }
         .birthday-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
-        .title { font-size: 4.5rem; text-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .title { font-size: 5.5rem; text-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        
+        /* 左下角小音乐图标 */
+        .music-icon {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 56px;
+            height: 56px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #ec4899;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+        .music-icon:hover { transform: scale(1.15); }
+        .music-icon.playing { 
+            animation: pulse 1.5s infinite; 
+            color: #22c55e;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(236, 72, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
     </style>
 </head>
 <body class="birthday-bg min-h-screen flex flex-col items-center justify-center text-center px-6 py-12 overflow-hidden">
 
-    <!-- 大标题 + 彩带 -->
-    <div class="mb-12">
-        <h1 class="title text-white font-bold mb-4 flex items-center justify-center gap-4">
+    <!-- 超大标题（点击放彩带） -->
+    <div id="titleDiv" class="mb-16 cursor-pointer">
+        <h1 class="title text-white font-bold mb-4 flex items-center justify-center gap-6">
             🎉 祝奇奇生日快乐！🎂
         </h1>
-        <p class="text-3xl text-white font-medium">今天是你的专属日子～</p>
+        <p class="text-4xl text-white font-medium">今天是你的专属日子～</p>
     </div>
 
-    <!-- 生日快乐歌 -->
-    <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 mb-12">
-        <h2 class="text-3xl font-bold text-pink-600 mb-6 flex items-center justify-center gap-3">
-            <i class="fas fa-music"></i> 播放生日快乐歌
+    <!-- 视频区域（醒目） -->
+    <div class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-10">
+        <h2 class="text-5xl font-bold text-pink-600 mb-8 flex items-center justify-center gap-4">
+            <i class="fas fa-video"></i> 奇奇的生日视频
         </h2>
-        <div class="aspect-video rounded-2xl overflow-hidden shadow-inner">
-            <iframe width="100%" height="100%" 
-                    src="https://www.youtube.com/embed/oMEtryL1cLk" 
-                    title="生日快乐歌（中文版）" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+        <div class="aspect-video rounded-3xl overflow-hidden bg-black shadow-inner">
+            <video controls class="w-full h-full" autoplay muted loop>
+                <source src="birthday-video.mp4" type="video/mp4">
+                请确认已上传 birthday-video.mp4 文件
+            </video>
         </div>
-        <p class="text-sm text-gray-500 mt-4">点击播放一起唱～（中文儿歌版，超可爱！）</p>
     </div>
 
-    <!-- 视频区（你随时可以换成自己的视频） -->
-    <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8">
-        <h2 class="text-3xl font-bold text-pink-600 mb-6 flex items-center justify-center gap-3">
-            <i class="fas fa-video"></i> 观看生日视频
-        </h2>
-        <div class="aspect-video rounded-2xl overflow-hidden shadow-inner">
-            <iframe width="100%" height="100%" 
-                    src="https://www.youtube.com/embed/Zm5wE8lpq84" 
-                    title="生日视频" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
-        </div>
-        <p class="text-sm text-gray-500 mt-4">想换成自己的视频？把YouTube链接发给我，我马上改代码！</p>
+    <!-- 左下角小音乐图标 -->
+    <div id="musicIcon" class="music-icon">
+        <i class="fas fa-music" id="musicIconInner"></i>
     </div>
+
+    <!-- 隐藏的音频 -->
+    <audio id="birthdaySong" loop>
+        <source src="birthday-song.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- 页脚 -->
-    <footer class="mt-16 text-white/70 text-sm">
-        © 2026 献给奇奇的生日惊喜 · 免费静态网页
+    <footer class="mt-20 text-white/70 text-sm">
+        © 2026 献给奇奇的生日惊喜 · 完全本地静态网页
     </footer>
 
-    <!-- 自动彩带特效 -->
     <script>
+        // 彩带函数
         function launchConfetti() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            setTimeout(() => confetti({ particleCount: 100, angle: 60, spread: 70, origin: { x: 0 } }), 300);
-            setTimeout(() => confetti({ particleCount: 100, angle: 120, spread: 70, origin: { x: 1 } }), 600);
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+            setTimeout(() => confetti({ particleCount: 120, angle: 60, spread: 70, origin: { x: 0 } }), 200);
+            setTimeout(() => confetti({ particleCount: 120, angle: 120, spread: 70, origin: { x: 1 } }), 400);
         }
-        window.onload = launchConfetti;
+
+        // 音乐控制
+        let isPlaying = false;
+        const audio = document.getElementById('birthdaySong');
+        const musicIcon = document.getElementById('musicIcon');
+        const iconInner = document.getElementById('musicIconInner');
+        
+        function toggleSong() {
+            if (isPlaying) {
+                audio.pause();
+                musicIcon.classList.remove('playing');
+                iconInner.classList.remove('fa-pause');
+                iconInner.classList.add('fa-music');
+            } else {
+                audio.play();
+                musicIcon.classList.add('playing');
+                iconInner.classList.remove('fa-music');
+                iconInner.classList.add('fa-pause');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 页面加载后绑定事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('titleDiv').addEventListener('click', launchConfetti);
+            musicIcon.addEventListener('click', toggleSong);
+            launchConfetti(); // 自动放一次彩带
+        });
     </script>
 
 </body>
